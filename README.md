@@ -51,8 +51,6 @@
   - https://github.com/codingforentrepreneurs
   
 ## Hello World
-
-  ### Intro 
   
   ### A Fresh Virtualenv
   
