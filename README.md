@@ -52,25 +52,69 @@
   
 ## Hello World
   
-  ### A Fresh Virtualenv
-  
-  ### Hello World
-  
-  ### Render HTML
-  
-  ### Django Template
-  
-  ### Template Context
-  
-  ### HTML Form
-  
-  ### Django Forms
-  
-  ### User Login
-  
-  ### User Register
-  
-  ### Setup & Serve Local Static & Media Files
+### A Fresh Virtualenv
+
+```
+virtualenv -p python3 .
+```
+
+### Hello World
+
+```
+pip install Django==1.11.4
+```
+
+```
+mkdir src && cd src
+```
+
+```
+django-admin startproject ecommerce .
+```
+
+```
+python manage.py runserver
+```
+
+### Render HTML
+
+Inside `ecommerce/src/ecommerce` create the file `views.py`
+
+```
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def home_page(request):
+  return HttpResponse("<h1>Hello World</h1>")
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```
+from django.conf.urls import url
+from django.contrib import admin
+
+from .views import home_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^admin/', admin.site.urls),
+]
+```
+
+### Django Template
+
+### Template Context
+
+### HTML Form
+
+### Django Forms
+
+### User Login
+
+### User Register
+
+### Setup & Serve Local Static & Media Files
   
 ## Products Component
 
