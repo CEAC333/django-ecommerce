@@ -104,11 +104,380 @@ urlpatterns = [
 
 ### Django Template
 
+- Bootstrap - Starter Template - http://getbootstrap.com/docs/4.0/getting-started/introduction/#starter-template
+
+Inside `ecommerce/src/ecommerce` create the file `views.py`
+
+```
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def home_page(request):
+
+  html_ = """
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              <title>Hello, world!</title>
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>Hello, world!</h1>
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+          """
+
+  return HttpResponse(html_)
+```
+
+
+Inside `ecommerce/src/ecommerce` modify the file `settings.py` line 57
+
+Go to `TEMPLATES` list, the first dict has a key `DIRS`
+
+```
+    'DIRS': [os.path.join(BASE_DIR, 'templates')]
+```
+
+Inside `ecommerce/src/` create the folder `templates`
+
+Inside `ecommerce/src/templates` create the file `home_page.html`
+
+```
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              <title>Hello, world We're working!</title>
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>Hello, world!</h1>
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
+
+
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def home_page(request):
+  return render(request, "home_page.html", {})
+```
+
 ### Template Context
+
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def home_page(request):
+  context = {
+    "title":"Hello World!",
+    "content":"Welcome to the homepage."
+  }
+  return render(request, "home_page.html", context)
+  
+def about_page(request):
+  context = {
+    "title":"About Page",
+    "content":"Welcome to the about page."
+  }
+  return render(request, "home_page.html", context)
+  
+def contact_page(request):
+  context = {
+    "title":"Contact",
+    "content":"Welcome to the contact page."
+  }
+  return render(request, "home_page.html", context)
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```
+from django.conf.urls import url
+from django.contrib import admin
+
+from .views import home_page, about_page, contact_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^admin/', admin.site.urls),
+]
+```
+
+Inside `ecommerce/src/templates` modify the file `home_page.html`
+
+```
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              <title>Hello, world We're working!</title>
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>Hello, world!</h1>
+              </div>
+              
+              <div class='container'>
+              <div class='row'>
+                <div class='col'>
+                  <p>{{ content }}</p>
+                </div>
+              </div>
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
 
 ### HTML Form
 
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def home_page(request):
+  context = {
+    "title":"Hello World!",
+    "content":"Welcome to the homepage."
+  }
+  return render(request, "home_page.html", context)
+  
+def about_page(request):
+  context = {
+    "title":"About Page",
+    "content":"Welcome to the about page."
+  }
+  return render(request, "home_page.html", context)
+  
+def contact_page(request):
+  context = {
+    "title":"Contact",
+    "content":"Welcome to the contact page."
+  }
+  if request.method == "POST":
+    # print(request.POST)
+    print(request.POST.get('fullname'))
+    print(request.POST.get('email'))
+    print(request.POST.get('content'))
+  return render(request, "contact/view.html", context)
+```
+
+Inside `ecommerce/src/ecommerce` create the folder `contact`
+
+Inside `ecommerce/src/ecommerce/contact` create the file `view.html`
+
+
+```
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              <title>Hello, world We're working!</title>
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>Hello, world!</h1>
+              </div>
+              
+              <div class='container'>
+              <div class='row'>
+                <div class='col'>
+                  <p>{{ content }}</p>
+                  <div class='col-sm-6 col-12'>
+                  <form method='POST'> {% csrf_token %}
+                    <input type='text' class='form-control' placeholder="Name" name='fullname'>
+                    <input type='email' class='form-control' placeholder="Email" name='email'>
+                    <textarea name='content' class='form-control' placeholder="Your content"></textarea>
+                    <button type='submit' class='btn btn-default'>Submit</button>
+                  </form>
+                  </div>
+                </div>
+              </div>
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
+
 ### Django Forms
+
+- https://docs.djangoproject.com/en/1.11/ref/forms/fields/#built-in-field-classes
+- https://docs.djangoproject.com/en/1.11/ref/forms/widgets/#customizing-widget-instances
+
+Inside `ecommerce/src/ecommerce` create the file `forms.py`
+
+```
+from django import forms
+
+class ContactForm(forms.Form):
+  fullname = forms.CharField(
+              widget=forms.TextInput(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your full name"
+                  }
+                )
+              )
+  email = forms.EmailField(
+              widget=forms.EmailInput(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your email"
+                  }
+                )
+              )
+  content = forms.CharField(
+              widget=forms.Textarea(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your message"
+                  }
+                )
+              )
+              
+  def clean_email(self):
+    email = self.cleaned_data.get("email")
+    if not "gmail.com" in email:
+      raise forms.ValidationError("Email has to be gmail.com")
+    return email
+
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```
+from django.http import HttpResponse
+from django.shortcuts import render
+
+from .forms import ContactForm
+
+def home_page(request):
+  context = {
+    "title":"Hello World!",
+    "content":"Welcome to the homepage."
+  }
+  return render(request, "home_page.html", context)
+  
+def about_page(request):
+  context = {
+    "title":"About Page",
+    "content":"Welcome to the about page."
+  }
+  return render(request, "home_page.html", context)
+  
+def contact_page(request):
+  contact_form = ContactForm(request.POST or None)
+  context = {
+    "title":"Contact",
+    "content":"Welcome to the contact page."
+    "form":contact_form
+  }
+  if contact_form.is_valid():
+    print(contact_form.cleaned_data)
+  return render(request, "contact/view.html", context)
+```
+
+
+Inside `ecommerce/src/ecommerce/contact` modify the file `view.html`
+
+
+```
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              <title>Hello, world We're working!</title>
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>Hello, world!</h1>
+              </div>
+              
+              <div class='container'>
+              <div class='row'>
+                <div class='col'>
+                  <p>{{ content }}</p>
+                  <div class='col-sm-6 col-12'>
+                  <form method='POST'> {% csrf_token %}
+                    {{ form }}
+                    <button type='submit' class='btn btn-default'>Submit</button>
+                  </form>
+                  </div>
+                </div>
+              </div>
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
 
 ### User Login
 
