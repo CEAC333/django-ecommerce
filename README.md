@@ -310,9 +310,9 @@ def contact_page(request):
   return render(request, "contact/view.html", context)
 ```
 
-Inside `ecommerce/src/ecommerce` create the folder `contact`
+Inside `ecommerce/src/templates` create the folder `contact`
 
-Inside `ecommerce/src/ecommerce/contact` create the file `view.html`
+Inside `ecommerce/src/templates/contact` create the file `view.html`
 
 
 ```
@@ -436,7 +436,7 @@ def contact_page(request):
 ```
 
 
-Inside `ecommerce/src/ecommerce/contact` modify the file `view.html`
+Inside `ecommerce/src/templates/contact` modify the file `view.html`
 
 
 ```
@@ -481,37 +481,606 @@ Inside `ecommerce/src/ecommerce/contact` modify the file `view.html`
 
 ### User Login
 
+- https://docs.djangoproject.com/en/1.11/topics/auth/default/#how-to-log-a-user-in
+
+
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```
+rom django.contrib.auth import authenticate, login
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+
+from .forms import ContactForm, LoginForm
+
+def home_page(request):
+  context = {
+    "title":"Hello World!",
+    "content":"Welcome to the homepage."
+  }
+  return render(request, "home_page.html", context)
+  
+def about_page(request):
+  context = {
+    "title":"About Page",
+    "content":"Welcome to the about page."
+  }
+  return render(request, "home_page.html", context)
+  
+def contact_page(request):
+  contact_form = ContactForm(request.POST or None)
+  context = {
+    "title":"Contact",
+    "content":"Welcome to the contact page."
+    "form":contact_form
+  }
+  if contact_form.is_valid():
+    print(contact_form.cleaned_data)
+  return render(request, "contact/view.html", context)
+  
+def login_page(request):
+  form = LoginForm(request.POST or None)
+  context = {
+    "form": form
+  }
+  print("User logged in")
+  #print(request.user.is_authenticated())
+  if form.is_valid():
+    print(form.cleaned_data)
+    username = form.cleaned_data.get("username")
+    password = form.cleaned_data.get("password")
+    user = authenticate(request, username=username, password=password)
+    print(user)
+    #print(request.user.is_authenticated())
+    if user is not None:
+      #print(request.user.is_authenticated())
+      login(request, user)
+      # Redirect to a success page.
+      #context['form'] = LoginForm()
+      return redirect("/login")
+    else:
+      # Return an 'invalid login' error message.
+      print("Error")
+    
+  return render(request, "auth/login.html", context)
+  
+def register_page(request):
+  form = LoginForm(request.POST or None)
+  if form.is_valid():
+    print(form.cleaned_data)
+  return render(request, "auth/register.html", {})
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `forms.py`
+
+```
+from django import forms
+
+class ContactForm(forms.Form):
+  fullname = forms.CharField(
+              widget=forms.TextInput(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your full name"
+                  }
+                )
+              )
+  email = forms.EmailField(
+              widget=forms.EmailInput(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your email"
+                  }
+                )
+              )
+  content = forms.CharField(
+              widget=forms.Textarea(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your message"
+                  }
+                )
+              )
+              
+  def clean_email(self):
+    email = self.cleaned_data.get("email")
+    if not "gmail.com" in email:
+      raise forms.ValidationError("Email has to be gmail.com")
+    return email
+    
+class LoginForm(forms.Form):
+  username = forms.CharField()
+  password = forms.CharField(
+              widget=forms.PasswordInput
+              )
+
+```
+
 ### User Register
 
+- https://docs.djangoproject.com/en/1.11/topics/auth/default/#user-objects
+
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```
+rom django.contrib.auth import authenticate, login, get_user_model
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+
+from .forms import ContactForm, LoginForm, RegisterForm
+
+def home_page(request):
+  context = {
+    "title":"Hello World!",
+    "content":"Welcome to the homepage.",
+    
+  }
+  if request.user.is_authenticated():
+    context["premium_content"] = "YEAHHHHHH"
+  return render(request, "home_page.html", context)
+  
+def about_page(request):
+  context = {
+    "title":"About Page",
+    "content":"Welcome to the about page."
+  }
+  return render(request, "home_page.html", context)
+  
+def contact_page(request):
+  contact_form = ContactForm(request.POST or None)
+  context = {
+    "title":"Contact",
+    "content":"Welcome to the contact page."
+    "form":contact_form
+  }
+  if contact_form.is_valid():
+    print(contact_form.cleaned_data)
+  return render(request, "contact/view.html", context)
+  
+def login_page(request):
+  form = LoginForm(request.POST or None)
+  context = {
+    "form": form
+  }
+  print("User logged in")
+  #print(request.user.is_authenticated())
+  if form.is_valid():
+    print(form.cleaned_data)
+    username = form.cleaned_data.get("username")
+    password = form.cleaned_data.get("password")
+    user = authenticate(request, username=username, password=password)
+    print(user)
+    #print(request.user.is_authenticated())
+    if user is not None:
+      #print(request.user.is_authenticated())
+      login(request, user)
+      # Redirect to a success page.
+      #context['form'] = LoginForm()
+      return redirect("/")
+    else:
+      # Return an 'invalid login' error message.
+      print("Error")
+    
+  return render(request, "auth/login.html", context)
+  
+User = get_user_model()
+def register_page(request):
+  form = RegisterForm(request.POST or None)
+  context = {
+    "form": form
+  }
+  if form.is_valid():
+    print(form.cleaned_data)
+    username = form.cleaned_data.get("username")
+    email = form.cleaned_data.get("email")
+    password = form.cleaned_data.get("password")
+    new_user = User.objects.create_user(username, email, password)
+    print(new_user)
+  return render(request, "auth/register.html", context)
+```
+
+
+Inside `ecommerce/src/templates` modify the file `home_page.html`
+
+```
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>{{ title }}</h1>
+                <h1>Hello, world we're working!</h1>
+              </div>
+              
+              <div class='container'>
+                <div class='row'>
+                  <div class='col'>
+                    <p>{{ content }}</p>
+                  </div>
+                </div>
+                {% if request.user.is_authenticated %}
+                <div class='row'>
+                  <div class='col'>
+                  <h1>Premium</h1>
+                  {{ premium_content }}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `forms.py`
+
+```
+from django import forms
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class ContactForm(forms.Form):
+  fullname = forms.CharField(
+              widget=forms.TextInput(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your full name"
+                  }
+                )
+              )
+  email = forms.EmailField(
+              widget=forms.EmailInput(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your email"
+                  }
+                )
+              )
+  content = forms.CharField(
+              widget=forms.Textarea(
+                attrs={
+                  "class": "form-control",
+                  "placeholder": "Your message"
+                  }
+                )
+              )
+              
+  def clean_email(self):
+    email = self.cleaned_data.get("email")
+    if not "gmail.com" in email:
+      raise forms.ValidationError("Email has to be gmail.com")
+    return email
+    
+class LoginForm(forms.Form):
+  username = forms.CharField()
+  password = forms.CharField(
+              widget=forms.PasswordInput
+              )
+              
+class RegisterForm(forms.Form):
+  username = forms.CharField()
+  email = forms.EmailField()
+  password = forms.CharField(
+                widget=forms.PasswordInput
+              )
+  password2 = forms.CharField(
+                label='Confirm password'          
+                widget=forms.PasswordInput
+              )
+              
+  def clean_username(self):
+    username = self.cleaned_data.get('username')
+    qs = User.objects.filter(username=username)
+    if qs.exists():
+      raise forms.ValidationError("Username is taken")
+    return username
+    
+  def clean_email(self):
+    email = self.cleaned_data.get('email')
+    qs = User.objects.filter(email=email)
+    if qs.exists():
+      raise forms.ValidationError("email is taken")
+    return email
+  
+  def clean(self):
+    data = self.cleaned_data
+    password = self.cleaned_data.get('password')
+    password2 = self.cleaned_data.get('password2')
+    if password2 != password:
+      raise forms.ValidationError("Passwords must match.")
+    return data
+
+```
+
+Inside `ecommerce/src/templates/auth` create the file `register.html`
+
+```
+<form method='POST'> {% csrf_token %}
+  {{ form }}
+  <button type='submit' class='btn btn-default'>Submit</button>
+</form>
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url
+from django.contrib import admin
+
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+```
+
 ### Setup & Serve Local Static & Media Files
+
+- http://getbootstrap.com/
+- https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+Inside `ecommerce` create the folder `static_cdn`
+
+Inside `ecommerce/src/ecommerce` modify the file `setting.py`, add this at the end of the file
+
+```
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static_my_proj"),
+]
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "static_root")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media_root")
+```
+
+Inside `ecommerce/src` create the folder `static_my_proj`
+
+
+Inside `ecommerce/src/ecommerce` modify the file `settings.py`, line 26
+
+```
+DEBUG = False
+```
+
+Inside the terminal with the env activated, run the commd to move static files:
+
+```
+python manage.py collectstatic
+```
+
+```
+python manage.py runserver
+```
+
+Inside `ecommerce/src/static_cdn` the folder `admin` was created, delete it
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url
+from django.contrib import admin
+
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+Inside `ecommerce/src/static_cdn` create the folder `media_root` 
+
+Inside `ecommerce/src/ecommerce/static_my_proj` create the folder `css` 
+
+Inside `ecommerce/src/ecommerce/static_my_proj/css` create the file `main.css` 
+
+```
+body {
+  color: #ccc;
+}
+```
+
+Inside the terminal with the env activated, run the commd to move static files to `static_cdn`:
+
+```
+python manage.py collectstatic
+```
+
+```
+python manage.py runserver
+```
+
+Inside `ecommerce/src/static_my_proj/css/img` download an image `img.jpg` 
+
+Inside the terminal with the env activated, run the commd to move static files to `static_cdn`:
+
+```
+python manage.py collectstatic
+```
+
+```
+python manage.py runserver
+```
+
+Inside `ecommerce/src/templates` modify the file `home_page.html`
+
+```
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+              <link rel='stylesheet' href='{ static "css/main.css" %}' >
+              
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>{{ title }}</h1>
+                <h1>Hello, world we're working!</h1>
+              </div>
+              
+              <div class='container'>
+                <div class='row'>
+                  <div class='col'>
+                    <img src="{% static 'img/img.jpg' %}" class='img-fluid' />
+                    <p>{{ content }}</p>
+                  </div>
+                </div>
+                {% if request.user.is_authenticated %}
+                <div class='row'>
+                  <div class='col'>
+                  <h1>Premium</h1>
+                  {{ premium_content }}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
   
 ## Products Component
 
-  ### Intro
+### Your First App Module
+
+```
+cd ecommerce
+source bin/activate
+cd src
+python manage.py startapp products
+```
+
+This will create the folder `products` inside `ecommerce/src`
+
+
+### Understanding CRUD
+
+- Create -- POST
+- Retrieve / List / Search --GET
+- Update -- PUT / Patch / POST
+- Delete -- Delete
+
+```
+python manage.py createsuperuser
+```
+
+```
+python manage.py runserver
+```
+
+Go to
+
+```
+localhost:8000/admin
+```
+
+### Product Model
+
+- https://docs.djangoproject.com/en/1.11/ref/models/fields/
+
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```
+from django.db import models
+
+# Create your models here.
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `settings.py`, line 33
+
+```
+INSTALLED_APPS = [
+  'django.contrib.admin',
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.sessions',
+  'django.contrib.messages',
+  'django.contrib.staticfiles',
   
-  ### Your First App Module
-  
-  ### Understanding CRUD
-  
-  ### Product Model
-  
-  ### Django Admin
-  
-  ### List View
-  
-  ### Detail View
-  
-  ### ImageField & FileField
-  
-  ### Understanding Lookups
-  
-  ### Custom Model Managers
-  
-  ### Featured & Custom QuerySets
-  
-  ### SlugField & Signals
-  
-  ### Product URLs
+  # our apps
+  'products'
+]
+```
+
+In the terminal
+
+```
+python manage.py makemigrations
+```
+
+```
+python manage.py migrate
+```
+
+### Django Admin
+
+### List View
+
+### Detail View
+
+### ImageField & FileField
+
+### Understanding Lookups
+
+### Custom Model Managers
+
+### Featured & Custom QuerySets
+
+### SlugField & Signals
+
+### Product URLs
   
 ## Templates
 
