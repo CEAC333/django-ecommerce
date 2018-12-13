@@ -80,7 +80,7 @@ python manage.py runserver
 
 Inside `ecommerce/src/ecommerce` create the file `views.py`
 
-```
+```python
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -90,7 +90,7 @@ def home_page(request):
 
 Inside `ecommerce/src/ecommerce` modify the file `urls.py`
 
-```
+```python
 from django.conf.urls import url
 from django.contrib import admin
 
@@ -108,7 +108,7 @@ urlpatterns = [
 
 Inside `ecommerce/src/ecommerce` create the file `views.py`
 
-```
+```python
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -148,7 +148,7 @@ Inside `ecommerce/src/ecommerce` modify the file `settings.py` line 57
 
 Go to `TEMPLATES` list, the first dict has a key `DIRS`
 
-```
+```python
     'DIRS': [os.path.join(BASE_DIR, 'templates')]
 ```
 
@@ -156,7 +156,7 @@ Inside `ecommerce/src/` create the folder `templates`
 
 Inside `ecommerce/src/templates` create the file `home_page.html`
 
-```
+```html
 <!doctype html>
           <html lang="en">
             <head>
@@ -185,7 +185,7 @@ Inside `ecommerce/src/templates` create the file `home_page.html`
 
 Inside `ecommerce/src/ecommerce` modify the file `views.py`
 
-```
+```python
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -197,7 +197,7 @@ def home_page(request):
 
 Inside `ecommerce/src/ecommerce` modify the file `views.py`
 
-```
+```python
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -225,7 +225,7 @@ def contact_page(request):
 
 Inside `ecommerce/src/ecommerce` modify the file `urls.py`
 
-```
+```python
 from django.conf.urls import url
 from django.contrib import admin
 
@@ -241,7 +241,7 @@ urlpatterns = [
 
 Inside `ecommerce/src/templates` modify the file `home_page.html`
 
-```
+```html
 <!doctype html>
           <html lang="en">
             <head>
@@ -279,7 +279,7 @@ Inside `ecommerce/src/templates` modify the file `home_page.html`
 
 Inside `ecommerce/src/ecommerce` modify the file `views.py`
 
-```
+```python
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -315,7 +315,7 @@ Inside `ecommerce/src/templates` create the folder `contact`
 Inside `ecommerce/src/templates/contact` create the file `view.html`
 
 
-```
+```html
 <!doctype html>
           <html lang="en">
             <head>
@@ -364,7 +364,7 @@ Inside `ecommerce/src/templates/contact` create the file `view.html`
 
 Inside `ecommerce/src/ecommerce` create the file `forms.py`
 
-```
+```python
 from django import forms
 
 class ContactForm(forms.Form):
@@ -403,7 +403,7 @@ class ContactForm(forms.Form):
 
 Inside `ecommerce/src/ecommerce` modify the file `views.py`
 
-```
+```python
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -439,7 +439,7 @@ def contact_page(request):
 Inside `ecommerce/src/templates/contact` modify the file `view.html`
 
 
-```
+```html
 <!doctype html>
           <html lang="en">
             <head>
@@ -486,7 +486,7 @@ Inside `ecommerce/src/templates/contact` modify the file `view.html`
 
 Inside `ecommerce/src/ecommerce` modify the file `views.py`
 
-```
+```python
 rom django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -553,7 +553,7 @@ def register_page(request):
 
 Inside `ecommerce/src/ecommerce` modify the file `forms.py`
 
-```
+```python
 from django import forms
 
 class ContactForm(forms.Form):
@@ -602,7 +602,7 @@ class LoginForm(forms.Form):
 
 Inside `ecommerce/src/ecommerce` modify the file `views.py`
 
-```
+```python
 rom django.contrib.auth import authenticate, login, get_user_model
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -682,7 +682,7 @@ def register_page(request):
 
 Inside `ecommerce/src/templates` modify the file `home_page.html`
 
-```
+```html
 <!doctype html>
           <html lang="en">
             <head>
@@ -727,7 +727,7 @@ Inside `ecommerce/src/templates` modify the file `home_page.html`
 
 Inside `ecommerce/src/ecommerce` modify the file `forms.py`
 
-```
+```python
 from django import forms
 from django.contrib.auth import get_user_model
 
@@ -808,7 +808,7 @@ class RegisterForm(forms.Form):
 
 Inside `ecommerce/src/templates/auth` create the file `register.html`
 
-```
+```html
 <form method='POST'> {% csrf_token %}
   {{ form }}
   <button type='submit' class='btn btn-default'>Submit</button>
@@ -817,7 +817,7 @@ Inside `ecommerce/src/templates/auth` create the file `register.html`
 
 Inside `ecommerce/src/ecommerce` modify the file `urls.py`
 
-```
+```python
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -849,7 +849,7 @@ Inside `ecommerce` create the folder `static_cdn`
 
 Inside `ecommerce/src/ecommerce` modify the file `setting.py`, add this at the end of the file
 
-```
+```python
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static_my_proj"),
 ]
@@ -865,7 +865,7 @@ Inside `ecommerce/src` create the folder `static_my_proj`
 
 Inside `ecommerce/src/ecommerce` modify the file `settings.py`, line 26
 
-```
+```python
 DEBUG = False
 ```
 
@@ -883,7 +883,7 @@ Inside `ecommerce/src/static_cdn` the folder `admin` was created, delete it
 
 Inside `ecommerce/src/ecommerce` modify the file `urls.py`
 
-```
+```python
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -913,7 +913,7 @@ Inside `ecommerce/src/ecommerce/static_my_proj` create the folder `css`
 
 Inside `ecommerce/src/ecommerce/static_my_proj/css` create the file `main.css` 
 
-```
+```css
 body {
   color: #ccc;
 }
@@ -943,7 +943,7 @@ python manage.py runserver
 
 Inside `ecommerce/src/templates` modify the file `home_page.html`
 
-```
+```html
 <!doctype html>
           <html lang="en">
             <head>
@@ -1028,7 +1028,7 @@ localhost:8000/admin
 
 Inside `ecommerce/src/products` modify the file `models.py` 
 
-```
+```python
 from django.db import models
 
 # Create your models here.
@@ -1040,7 +1040,7 @@ class Product(models.Model):
 
 Inside `ecommerce/src/ecommerce` modify the file `settings.py`, line 33
 
-```
+```python
 INSTALLED_APPS = [
   'django.contrib.admin',
   'django.contrib.auth',
