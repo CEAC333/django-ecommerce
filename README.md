@@ -1066,21 +1066,1253 @@ python manage.py migrate
 
 ### Django Admin
 
+Inside `ecommerce/src/products` modify the file `admin.py`
+
+```python
+from django.contrib import admin
+
+from .models import Product
+
+admin.site.Register(Product)
+```
+
+In the terminal, with the env activated
+
+```
+python manage.py runserver
+```
+
+On the browser
+
+```
+localhost:8000/admin
+```
+
+Go to the `Products` -> Add Product
+
+`Title:` T-Shirt
+
+`Description:` This is an awesome shirt. Buy it. :)
+
+And `SAVE` it
+
+Go to the `Products` -> Add Product
+
+`Title:` Hat
+
+`Description:` This is an awesome hat.
+
+And `SAVE` it
+
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```python
+from django.db import models
+
+# Create your models here.
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+  
+  def __str__(self):
+    return self.title
+    
+  def __unicode__(self):
+    return self.title
+```
+
+In the terminal
+
+```
+python manage.py makemigrations
+```
+
+```
+python manage.py migrate
+```
+
+```
+python manage.py runserver
+```
+
 ### List View
+
+- https://docs.djangoproject.com/en/1.11/ref/class-based-views/generic-display/#django.views.generic.list.ListView
+
+Inside `ecommerce/src/products` modify the file `views.py`
+
+```python
+from django.views.generic import ListView
+from django.shortcuts import render
+
+from .models import Product
+
+class ProductListView(ListView):
+  queryset = Product.objects.all()
+  template_name = "products/list.html"
+  
+  # def get_context_data(self, *args, **kwargs):
+  #   context = super(ProductListView, self).get_context_data(*args, **kwargs)
+  #   print(context)
+  #   return context
+    
+  
+def product_list_view(request):
+  context = {
+    'object_list': queryset
+  }
+  return render(request, "products/list.html", context)
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url
+from django.contrib import admin
+
+from products.views import ProductListView, product_list_view
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^products/$', ProductListView.as_view()),
+  url(r'^products-fbv/$', product_list_view),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+Inside `ecommerce/src/products` create the folder `templates`
+Inside `ecommerce/src/products/templates` create the folder `products`
+Inside `ecommerce/src/products/templates/products` create the file `list.html`
+
+```html
+
+{% for obj in object_list %}
+
+{{ obj.title }} <br/>
+
+{% endfor %}
+```
 
 ### Detail View
 
+- https://www.codingforentrepreneurs.com/blog/common-regular-expressions-for-django-urls/
+
+Inside `ecommerce/src/products` modify the file `views.py`
+
+```python
+from django.views.generic import ListView, DetailView
+from django.shortcuts import render, get_object_or_404
+
+from .models import Product
+
+class ProductListView(ListView):
+  queryset = Product.objects.all()
+  template_name = "products/list.html"
+  
+  # def get_context_data(self, *args, **kwargs):
+  #   context = super(ProductListView, self).get_context_data(*args, **kwargs)
+  #   print(context)
+  #   return context
+    
+  
+def product_list_view(request):
+  queryset = Product.objects.all()
+  context = {
+    'object_list': queryset
+  }
+  return render(request, "products/list.html", context)
+  
+  
+class ProductDetailView(DetailView):
+  queryset = Product.objects.all()
+  template_name = "products/detail.html"
+  
+  def get_context_data(self, *args, **kwargs):
+    context = super(ProductDetailView, self).get_context_data(*args, **kwargs)
+    print(context)
+    return context
+    
+  
+def product_detail_view(request, pk=None, *args, **kwargs):
+  # instance = Product.objects.get(pk=pk) #id
+  instance = get_object_or_404(Product, pk=pk)
+  context = {
+    'object': instance
+  }
+  return render(request, "products/detail.html", context)
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url
+from django.contrib import admin
+
+from products.views import ProductListView, product_list_view, ProductDetailView, product_detail_view
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^products/$', ProductListView.as_view()),
+  url(r'^products-fbv/$', product_list_view),
+  url(r'^products/(?P<pk>\d+)/$', ProductDetailView.as_view()),
+  url(r'^products-fbv/(?P<pk>\d+)/$', product_detail_view),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+Inside `ecommerce/src/products/templates/products` create the file `detail.html`
+
+```html
+{{ object.title }} <br/>
+{{ object.description }} <br/>
+```
+
 ### ImageField & FileField
+
+- https://docs.djangoproject.com/en/1.11/ref/models/fields/#django.db.models.FileField
+- https://www.codingforentrepreneurs.com/blog/large-file-uploads-with-amazon-s3-django/
+
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```python
+import random
+import os
+from django.db import models
+
+def get_filename_ext(filename):
+  base_name = os.path.basename(filename)
+  name, ext = os.path.splitext(filename)
+  return name, ext
+
+def upload_image_path(instance, filename):
+  print(instance)
+  print(filename)
+  new_filename = random.randint(1,3910209312)
+  name, ext = get_filename_ext(filename)
+  final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
+  return "producs/{new_filename}/{final_filename}".format(
+          new_filename=new_filename, 
+          final_filename=final_filename
+          )
+
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+  image       = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+  
+  def __str__(self):
+    return self.title
+    
+  def __unicode__(self):
+    return self.title
+```
+
+Inside `ecommerce/src/products/templates/products` modify the file `detail.html`
+
+```html
+{{ object.title }} <br/>
+{{ object.description }} <br/>
+{% if object.image %}
+  < img src='{{ object.image.url }}' class='img-fluid' />
+{% endif %}
+```
+
+In the terminal
+
+```
+pip install pillow
+```
+
+```
+python manage.py makemigrations
+```
+
+```
+python manage.py migrate
+```
+
+```
+python manage.py runserver
+```
 
 ### Understanding Lookups
 
+In the terminal
+
+```
+python manage.py shell
+```
+
+```
+from products.models import Product
+queryset = Product.objects.all()
+queryset
+
+qs = Product.objects.filter(title__contains='shirt')
+qs
+
+qs = Product.objects.filter(title__contains='hat')
+qs
+
+qs = Product.objects.filter(description__contains='hat')
+qs
+
+qs = Product.objects.filter(description__contains='product')
+qs
+
+qs = Product.objects.filter(description__icontains='product')
+qs
+
+qs = Product.objects.filter(description__icontains='this')
+qs
+
+qs = Product.objects.filter(title__icontains='hat')
+qs
+
+qs = Product.objects.filter(title__icontains='hat', description__iexact='Abc')
+qs
+
+Product.objects.filter(id=4)
+Product.objects.filter(pk=4)
+Product.objects.filter(pk=3)
+Product.objects.get(id=3)
+Product.objects.get(id=4) # Generate an Exception
+
+try:
+  Product.objects.get(id=4)
+except Product.DoesNotExist:
+  print('no product here')
+except:
+  print("huh?")
+```
+
+Inside `ecommerce/src/products` modify the file `views.py`
+
+```python
+from django.http import Http404
+from django.views.generic import ListView, DetailView
+from django.shortcuts import render, get_object_or_404
+
+from .models import Product
+
+class ProductListView(ListView):
+  queryset = Product.objects.all()
+  template_name = "products/list.html"
+  
+  # def get_context_data(self, *args, **kwargs):
+  #   context = super(ProductListView, self).get_context_data(*args, **kwargs)
+  #   print(context)
+  #   return context
+    
+  
+def product_list_view(request):
+  queryset = Product.objects.all()
+  context = {
+    'object_list': queryset
+  }
+  return render(request, "products/list.html", context)
+  
+  
+class ProductDetailView(DetailView):
+  queryset = Product.objects.all()
+  template_name = "products/detail.html"
+  
+  def get_context_data(self, *args, **kwargs):
+    context = super(ProductDetailView, self).get_context_data(*args, **kwargs)
+    print(context)
+    return context
+    
+  
+def product_detail_view(request, pk=None, *args, **kwargs):
+  # instance = Product.objects.get(pk=pk) #id
+  # instance = get_object_or_404(Product, pk=pk)
+  
+  # try:
+  #   instance = Product.objects.get(id=pk)
+  # except Product.DoesNotExist:
+  #   print('no product here')
+  #   raise Http404("Product doesn't exist")
+  # except:
+  #   print("huh?")
+    
+  qs = Product.objects.filter(id=pk)
+  # print(qs)
+  if qs.exists() and qs.count() == 1: # len(qs)
+    instance = qs.first()
+  else:
+    raise Http404("Product doesn't exist")
+  
+  context = {
+    'object': instance
+  }
+  return render(request, "products/detail.html", context)
+```
+
+In the terminal
+
+```
+python manage.py runserver
+```
+
 ### Custom Model Managers
+
+
+Inside `ecommerce/src/products` modify the file `views.py`
+
+```python
+from django.http import Http404
+from django.views.generic import ListView, DetailView
+from django.shortcuts import render, get_object_or_404
+
+from .models import Product
+
+class ProductListView(ListView):
+  queryset = Product.objects.all()
+  template_name = "products/list.html"
+  
+  # def get_context_data(self, *args, **kwargs):
+  #   context = super(ProductListView, self).get_context_data(*args, **kwargs)
+  #   print(context)
+  #   return context
+  
+  def get_queryset(self, *args, **kwargs):
+    request = self.request
+    return Product.objects.all()
+    
+  
+def product_list_view(request):
+  queryset = Product.objects.all()
+  context = {
+    'object_list': queryset
+  }
+  return render(request, "products/list.html", context)
+  
+  
+class ProductDetailView(DetailView):
+  # queryset = Product.objects.all()
+  template_name = "products/detail.html"
+  
+  def get_context_data(self, *args, **kwargs):
+    context = super(ProductDetailView, self).get_context_data(*args, **kwargs)
+    print(context)
+    return context
+    
+  def get_object(self, *args, **kwargs):
+    request = self.request
+    pk = self.kwargs.get('pk')
+    instance = Product.objects.get_by_id(pk)
+    if instance is None:
+      raise Http404("Product doesn't exist")
+    return instance
+    
+  # def get_queryset(self, *args, **kwargs):
+  #   request = self.request
+  #   pk = self.kwargs.get('pk')
+  #   return Product.objects.filter(pk=pk)
+    
+  
+def product_detail_view(request, pk=None, *args, **kwargs):
+  # instance = Product.objects.get(pk=pk) #id
+  # instance = get_object_or_404(Product, pk=pk)
+  
+  # try:
+  #   instance = Product.objects.get(id=pk)
+  # except Product.DoesNotExist:
+  #   print('no product here')
+  #   raise Http404("Product doesn't exist")
+  # except:
+  #   print("huh?")
+    
+  instance = Product.objects.get_by_id(pk)
+  if instance is None:
+    raise Http404("Product doesn't exist")
+  # print(instance)
+  # qs = Product.objects.filter(id=pk)
+  
+  # print(qs)
+  # if qs.exists() and qs.count() == 1: # len(qs)
+  #   instance = qs.first()
+  # else:
+  #   raise Http404("Product doesn't exist")
+  
+  context = {
+    'object': instance
+  }
+  return render(request, "products/detail.html", context)
+```
+
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```python
+import random
+import os
+from django.db import models
+
+def get_filename_ext(filename):
+  base_name = os.path.basename(filename)
+  name, ext = os.path.splitext(filename)
+  return name, ext
+
+def upload_image_path(instance, filename):
+  print(instance)
+  print(filename)
+  new_filename = random.randint(1,3910209312)
+  name, ext = get_filename_ext(filename)
+  final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
+  return "producs/{new_filename}/{final_filename}".format(
+          new_filename=new_filename, 
+          final_filename=final_filename
+          )
+          
+class ProductManager(models.Manager):
+  def get_by_id(self, id):
+    qs = self.get_queryset().filter(id=id) # Product.objects == self.get_queryset()
+    if qs.count() == 1:
+      return qs.first()
+    return None
+    
+
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+  image       = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+  
+  objects = ProductManager()
+  
+  def __str__(self):
+    return self.title
+    
+  def __unicode__(self):
+    return self.title
+```
 
 ### Featured & Custom QuerySets
 
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```python
+import random
+import os
+from django.db import models
+
+def get_filename_ext(filename):
+  base_name = os.path.basename(filename)
+  name, ext = os.path.splitext(filename)
+  return name, ext
+
+def upload_image_path(instance, filename):
+  print(instance)
+  print(filename)
+  new_filename = random.randint(1,3910209312)
+  name, ext = get_filename_ext(filename)
+  final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
+  return "producs/{new_filename}/{final_filename}".format(
+          new_filename=new_filename, 
+          final_filename=final_filename
+          )
+          
+class ProductQuerySet(models.query.QuerySet):
+  def active(self):
+    return self.filter(active=True)
+    
+  def featured(self):
+    return self.filter(featured=True, active=True)
+          
+class ProductManager(models.Manager):
+  def get_queryset(self):
+    return ProductQuerySet(self.model, using=self._db)
+    
+  def all(self):
+    return self.get_queryset().active()
+  
+  def featured(self): #Product.objects.featured()
+    return self.get_queryset().featured()
+  
+  def get_by_id(self, id):
+    qs = self.get_queryset().filter(id=id) # Product.objects == self.get_queryset()
+    if qs.count() == 1:
+      return qs.first()
+    return None
+    
+
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+  image       = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+  featured    = models.BooleanField(default=False)
+  active      = models.BooleanField(default=True)
+  
+  objects = ProductManager()
+  
+  def __str__(self):
+    return self.title
+    
+  def __unicode__(self):
+    return self.title
+```
+
+
+Inside `ecommerce/src/products` modify the file `views.py`
+
+```python
+from django.http import Http404
+from django.views.generic import ListView, DetailView
+from django.shortcuts import render, get_object_or_404
+
+from .models import Product
+
+class ProductFeaturedListView(ListView):
+  template_name = "products/list.html"
+  
+  def get_queryset(self, *args, **kwargs):
+    request = self.request
+    return Product.objects.all().featured()
+    
+class ProductFeaturedDetailView(DetailView):
+  queryset = Product.objects.all().featured()
+  template_name = "products/featured-detail.html"
+  
+  # def get_queryset(self, *args, **kwargs):
+  #   request = self.request
+  #   return Product.objects.featured()
+
+class ProductListView(ListView):
+  template_name = "products/list.html"
+  
+  # def get_context_data(self, *args, **kwargs):
+  #   context = super(ProductListView, self).get_context_data(*args, **kwargs)
+  #   print(context)
+  #   return context
+  
+  def get_queryset(self, *args, **kwargs):
+    request = self.request
+    return Product.objects.all()
+    
+  
+def product_list_view(request):
+  queryset = Product.objects.all()
+  context = {
+    'object_list': queryset
+  }
+  return render(request, "products/list.html", context)
+  
+  
+class ProductDetailView(DetailView):
+  # queryset = Product.objects.all()
+  template_name = "products/detail.html"
+  
+  def get_context_data(self, *args, **kwargs):
+    context = super(ProductDetailView, self).get_context_data(*args, **kwargs)
+    print(context)
+    return context
+    
+  def get_object(self, *args, **kwargs):
+    request = self.request
+    pk = self.kwargs.get('pk')
+    instance = Product.objects.get_by_id(pk)
+    if instance is None:
+      raise Http404("Product doesn't exist")
+    return instance
+    
+  # def get_queryset(self, *args, **kwargs):
+  #   request = self.request
+  #   pk = self.kwargs.get('pk')
+  #   return Product.objects.filter(pk=pk)
+    
+  
+def product_detail_view(request, pk=None, *args, **kwargs):
+  # instance = Product.objects.get(pk=pk, featured=True) #id
+  # instance = get_object_or_404(Product, pk=pk, featured=True)
+  
+  # try:
+  #   instance = Product.objects.get(id=pk)
+  # except Product.DoesNotExist:
+  #   print('no product here')
+  #   raise Http404("Product doesn't exist")
+  # except:
+  #   print("huh?")
+    
+  instance = Product.objects.get_by_id(pk)
+  if instance is None:
+    raise Http404("Product doesn't exist")
+  # print(instance)
+  # qs = Product.objects.filter(id=pk)
+  
+  # print(qs)
+  # if qs.exists() and qs.count() == 1: # len(qs)
+  #   instance = qs.first()
+  # else:
+  #   raise Http404("Product doesn't exist")
+  
+  context = {
+    'object': instance
+  }
+  return render(request, "products/detail.html", context)
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url
+from django.contrib import admin
+
+from products.views import (
+      ProductListView, 
+      product_list_view, 
+      ProductDetailView, 
+      product_detail_view,
+      ProductFeaturedListView,
+      ProductFeaturedDetailView
+      )
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^featured/$', ProductFeaturedListView.as_view()),
+  url(r'^featured/(?P<pk>\d+)/$', ProductFeaturedDetailView.as_view()),
+  url(r'^products/$', ProductListView.as_view()),
+  url(r'^products-fbv/$', product_list_view),
+  url(r'^products/(?P<pk>\d+)/$', ProductDetailView.as_view()),
+  url(r'^products-fbv/(?P<pk>\d+)/$', product_detail_view),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+In the terminal
+
+```
+python manage.py makemigrations
+```
+
+```
+python manage.py migrate
+```
+
+```
+python manage.py runserver
+```
+
+On a browser
+
+```
+localhost:8000/admin/products/
+```
+
+`Title:` Supercomputer
+
+`Description:` Yeahh
+
+`Price:` 399999999.99
+
+- [X] Featured
+
+Inside `ecommerce/src/products/templates/products` create the file `featured-detail.html`
+
+```html
+{{ object.title }} <br/>
+{{ object.description }} <br/>
+{% if object.image %}
+  < img src='{{ object.image.url }}' class='img-fluid' />
+{% endif %}
+```
+
 ### SlugField & Signals
 
+- https://docs.djangoproject.com/en/1.11/ref/models/fields/#slugfield
+- https://www.codingforentrepreneurs.com/blog/common-regular-expressions-for-django-urls/
+- https://www.codingforentrepreneurs.com/blog/a-unique-slug-generator-for-django
+
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```python
+import random
+import os
+from django.db import models
+from django.db.models.signals import pre_save, post_save
+
+from .utils import unique_slug_generator
+
+def get_filename_ext(filename):
+  base_name = os.path.basename(filename)
+  name, ext = os.path.splitext(filename)
+  return name, ext
+
+def upload_image_path(instance, filename):
+  print(instance)
+  print(filename)
+  new_filename = random.randint(1,3910209312)
+  name, ext = get_filename_ext(filename)
+  final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
+  return "producs/{new_filename}/{final_filename}".format(
+          new_filename=new_filename, 
+          final_filename=final_filename
+          )
+          
+class ProductQuerySet(models.query.QuerySet):
+  def active(self):
+    return self.filter(active=True)
+    
+  def featured(self):
+    return self.filter(featured=True, active=True)
+          
+class ProductManager(models.Manager):
+  def get_queryset(self):
+    return ProductQuerySet(self.model, using=self._db)
+    
+  def all(self):
+    return self.get_queryset().active()
+  
+  def featured(self): #Product.objects.featured()
+    return self.get_queryset().featured()
+  
+  def get_by_id(self, id):
+    qs = self.get_queryset().filter(id=id) # Product.objects == self.get_queryset()
+    if qs.count() == 1:
+      return qs.first()
+    return None
+    
+
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  slug        = models.SlugField(blank=True, unique=True)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+  image       = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+  featured    = models.BooleanField(default=False)
+  active      = models.BooleanField(default=True)
+  
+  
+  objects = ProductManager()
+  
+  def __str__(self):
+    return self.title
+    
+  def __unicode__(self):
+    return self.title
+    
+def product_pre_save_receiver(sender, instance, *args, **kwargs):
+  if not instance.slug:
+    instance.slug = unique_slug_generator(instance)
+    
+pre_save.connect(product_pre_save_receiver, sender=Product)
+```
+
+Inside `ecommerce/src/products` modify the file `admin.py` 
+
+```python
+from django.contrib import admin
+
+from .models import Product
+
+class ProductAdmin(admin.ModelAdmin):
+  list_display = ['__str__', 'slug']
+  class Meta:
+    model = Product
+
+admin.site.register(Product, ProductAdmin)
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url
+from django.contrib import admin
+
+from products.views import (
+      ProductListView, 
+      product_list_view, 
+      ProductDetailView, 
+      ProductDetailSlugView,
+      product_detail_view,
+      ProductFeaturedListView,
+      ProductFeaturedDetailView
+      )
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^featured/$', ProductFeaturedListView.as_view()),
+  url(r'^featured/(?P<pk>\d+)/$', ProductFeaturedDetailView.as_view()),
+  url(r'^products/$', ProductListView.as_view()),
+  url(r'^products-fbv/$', product_list_view),
+  # url(r'^products/(?P<pk>\d+)/$', ProductDetailView.as_view()),
+  url(r'^products/(?P<slug>[\w-]+)/$', ProductDetailSlugView.as_view()),
+  url(r'^products-fbv/(?P<pk>\d+)/$', product_detail_view),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+Inside `ecommerce/src/products` modify the file `views.py`
+
+```python
+from django.http import Http404
+from django.views.generic import ListView, DetailView
+from django.shortcuts import render, get_object_or_404
+
+from .models import Product
+
+class ProductFeaturedListView(ListView):
+  template_name = "products/list.html"
+  
+  def get_queryset(self, *args, **kwargs):
+    request = self.request
+    return Product.objects.all().featured()
+    
+class ProductFeaturedDetailView(DetailView):
+  queryset = Product.objects.all().featured()
+  template_name = "products/featured-detail.html"
+  
+  # def get_queryset(self, *args, **kwargs):
+  #   request = self.request
+  #   return Product.objects.featured()
+
+class ProductListView(ListView):
+  template_name = "products/list.html"
+  
+  # def get_context_data(self, *args, **kwargs):
+  #   context = super(ProductListView, self).get_context_data(*args, **kwargs)
+  #   print(context)
+  #   return context
+  
+  def get_queryset(self, *args, **kwargs):
+    request = self.request
+    return Product.objects.all()
+    
+  
+def product_list_view(request):
+  queryset = Product.objects.all()
+  context = {
+    'object_list': queryset
+  }
+  return render(request, "products/list.html", context)
+  
+class ProductDetailSlugView(DetailView):
+  queryset = Product.objects.all()
+  template_name = "products/detail.html"
+  
+  def get_object(self, *args, **kwargs):
+    request = self.request
+    slug = self.kwargs.get('slug')
+    # instance = get_object_or_404(Product, slug=slug, active=True)
+    try:
+      instance = Product.objects.get(slug=slug, active=True)
+    except Product.DoesNotExist:
+      raise Http404("Not found..")
+    except Product.MultipleObjectsReturned:
+      qs = Product.objects.filter(slug=slug, active=True)
+      instance = qs.first()
+    except:
+      raise Http404("Uhhmmm")
+    return instance
+
+class ProductDetailView(DetailView):
+  # queryset = Product.objects.all()
+  template_name = "products/detail.html"
+  
+  def get_context_data(self, *args, **kwargs):
+    context = super(ProductDetailView, self).get_context_data(*args, **kwargs)
+    print(context)
+    return context
+    
+  def get_object(self, *args, **kwargs):
+    request = self.request
+    pk = self.kwargs.get('pk')
+    instance = Product.objects.get_by_id(pk)
+    if instance is None:
+      raise Http404("Product doesn't exist")
+    return instance
+    
+  # def get_queryset(self, *args, **kwargs):
+  #   request = self.request
+  #   pk = self.kwargs.get('pk')
+  #   return Product.objects.filter(pk=pk)
+    
+  
+def product_detail_view(request, pk=None, *args, **kwargs):
+  # instance = Product.objects.get(pk=pk, featured=True) #id
+  # instance = get_object_or_404(Product, pk=pk, featured=True)
+  
+  # try:
+  #   instance = Product.objects.get(id=pk)
+  # except Product.DoesNotExist:
+  #   print('no product here')
+  #   raise Http404("Product doesn't exist")
+  # except:
+  #   print("huh?")
+    
+  instance = Product.objects.get_by_id(pk)
+  if instance is None:
+    raise Http404("Product doesn't exist")
+  # print(instance)
+  # qs = Product.objects.filter(id=pk)
+  
+  # print(qs)
+  # if qs.exists() and qs.count() == 1: # len(qs)
+  #   instance = qs.first()
+  # else:
+  #   raise Http404("Product doesn't exist")
+  
+  context = {
+    'object': instance
+  }
+  return render(request, "products/detail.html", context)
+```
+
+Inside `ecommerce/src/products` create the file `utils.py`
+
+```python
+import random
+import string
+
+from django.utils.text import slugify
+
+
+def random_string_generator(size=10, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def unique_slug_generator(instance, new_slug=None):
+    """
+    This is for a Django project and it assumes your instance 
+    has a model with a slug field and a title character (char) field.
+    """
+    if new_slug is not None:
+        slug = new_slug
+    else:
+        slug = slugify(instance.title)
+
+    Klass = instance.__class__
+    qs_exists = Klass.objects.filter(slug=slug).exists()
+    if qs_exists:
+        new_slug = "{slug}-{randstr}".format(
+                    slug=slug,
+                    randstr=random_string_generator(size=4)
+                )
+        return unique_slug_generator(instance, new_slug=new_slug)
+    return slug
+```
+
+In the terminal
+
+```
+python manage.py makemigrations
+```
+
+```
+python manage.py migrate
+```
+
+```
+python manage.py runserver
+```
+
 ### Product URLs
+
+Inside `ecommerce/src/products` create the file `urls.py`
+
+```python
+
+from django.conf.urls import url
+
+from .views import (
+      ProductListView, 
+      # product_list_view, 
+      # ProductDetailView, 
+      ProductDetailSlugView,
+      # product_detail_view,
+      # ProductFeaturedListView,
+      # ProductFeaturedDetailView
+      )
+
+urlpatterns = [
+  url(r'^$', ProductListView.as_view()),
+  url(r'^products/(?P<slug>[\w-]+)/$', ProductDetailSlugView.as_view()),
+]
+```
+
+Inside `ecommerce/src/ecommerce` modify the file `urls.py`
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.conf.urls import url, include
+from django.contrib import admin
+
+# from products.views import (
+#       ProductListView, 
+#       product_list_view, 
+#       ProductDetailView, 
+#       product_detail_view,
+#       ProductFeaturedListView,
+#       ProductFeaturedDetailView
+#       )
+
+from .views import home_page, about_page, contact_page, login_page, register_page
+
+urlpatterns = [
+  url(r'^$', home_page),
+  url(r'^about/$', about_page),
+  url(r'^contact/$', contact_page),
+  url(r'^login/$', login_page),
+  url(r'^register/$', register_page),
+  url(r'^products/', include("products.urls")),
+  # url(r'^featured/$', ProductFeaturedListView.as_view()),
+  # url(r'^featured/(?P<pk>\d+)/$', ProductFeaturedDetailView.as_view()),
+  # url(r'^products/$', ProductListView.as_view()),
+  # url(r'^products-fbv/$', product_list_view),
+  # url(r'^products/(?P<pk>\d+)/$', ProductDetailView.as_view()),
+  # url(r'^products-fbv/(?P<pk>\d+)/$', product_detail_view),
+  url(r'^admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+  urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+Inside `ecommerce/src/products` modify the file `models.py` 
+
+```python
+import random
+import os
+from django.db import models
+from django.db.models.signals import pre_save, post_save
+
+from .utils import unique_slug_generator
+
+def get_filename_ext(filename):
+  base_name = os.path.basename(filename)
+  name, ext = os.path.splitext(filename)
+  return name, ext
+
+def upload_image_path(instance, filename):
+  print(instance)
+  print(filename)
+  new_filename = random.randint(1,3910209312)
+  name, ext = get_filename_ext(filename)
+  final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
+  return "producs/{new_filename}/{final_filename}".format(
+          new_filename=new_filename, 
+          final_filename=final_filename
+          )
+          
+class ProductQuerySet(models.query.QuerySet):
+  def active(self):
+    return self.filter(active=True)
+    
+  def featured(self):
+    return self.filter(featured=True, active=True)
+          
+class ProductManager(models.Manager):
+  def get_queryset(self):
+    return ProductQuerySet(self.model, using=self._db)
+    
+  def all(self):
+    return self.get_queryset().active()
+  
+  def featured(self): #Product.objects.featured()
+    return self.get_queryset().featured()
+  
+  def get_by_id(self, id):
+    qs = self.get_queryset().filter(id=id) # Product.objects == self.get_queryset()
+    if qs.count() == 1:
+      return qs.first()
+    return None
+    
+
+class Product(models.Model):
+  title       = models.CharField(max_length=120)
+  slug        = models.SlugField(blank=True, unique=True)
+  description = models.TextField()
+  price       = models.DecimalField(decimal_places=2, max_digits=20, default=39.99) 
+  image       = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+  featured    = models.BooleanField(default=False)
+  active      = models.BooleanField(default=True)
+  
+  
+  objects = ProductManager()
+  
+  def get_absolute_url(self):
+    return "/products/{slug}/".format(slug=self.slug)
+  
+  def __str__(self):
+    return self.title
+    
+  def __unicode__(self):
+    return self.title
+    
+def product_pre_save_receiver(sender, instance, *args, **kwargs):
+  if not instance.slug:
+    instance.slug = unique_slug_generator(instance)
+    
+pre_save.connect(product_pre_save_receiver, sender=Product)
+```
+
+Inside `ecommerce/src/products/templates/products` modify the file `list.html`
+
+```html
+
+{% for obj in object_list %}
+
+<a href='{{ obj.get_absolute_url }}'>{{ obj.title }}</a><br/>
+
+{% endfor %}
+```
   
 ## Templates
 
