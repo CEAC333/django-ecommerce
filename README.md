@@ -2469,7 +2469,280 @@ Inside `ecommerce/src/templates/contact` modify the file `view.html`
 
 ### Include Tag
 
+Inside `ecommerce/src/products/templates/products` modify the file `detail.html`
+
+```html
+{% extends "base.html" %}
+
+{% block content %}
+
+  {{ object.title }} <br/>
+  {{ object.description }} <br/>
+  {% if object.image %}
+    < img src='{{ object.image.url }}' class='img-fluid' />
+  {% endif %}
+
+{% endblock %}
+```
+
+Inside `ecommerce/src/templates` modify the file `base.html`
+
+```html
+{% load static %}
+<!doctype html>
+  <html lang="en">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>Base Template</title>
+      {% include 'base/css.html' %}
+      {% block base_head %}{% endblock %}
+    </head>
+    <body>
+      {% incude 'base/navbar.html' %}
+      {% block content %}{% endblock %}
+
+      {% include 'base/js.html' %}
+    </body>
+  </html>
+```
+
+Inside `ecommerce/src/templates/base` create the file `navbar.html`
+
+```html
+<h1>Nav</h1>
+```
+
+Inside `ecommerce/src/templates` modify the file `home_page.html`
+
+```html
+{% extends "base.html" %}
+{% load static %}
+
+<title>Home Page Template</title>
+
+{% block base_head %}
+<link rel='stylesheet' href='{ static "css/main.css" %}' >
+{% endblock %}
+
+{% block content %}
+
+<div class='text-center'>
+  <h1>{{ title }}</h1>
+  <h1>Hello, world we're working!</h1>
+</div>
+
+<div class='container'>
+  <div class='row'>
+    <div class='col'>
+      <p>{{ content }}</p>
+    </div>
+  </div>
+  {% if request.user.is_authenticated %}
+  <div class='row'>
+    <div class='col'>
+    <h1>Premium</h1>
+    {{ premium_content }}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+<!doctype html>
+          <html lang="en">
+            <head>
+              <!-- Required meta tags -->
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+              <!-- Bootstrap CSS -->
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+              
+            </head>
+            <body>
+              <div class='text-center'>
+                <h1>{{ title }}</h1>
+                <h1>Hello, world we're working!</h1>
+              </div>
+              
+              <div class='container'>
+                <div class='row'>
+                  <div class='col'>
+                    <p>{{ content }}</p>
+                  </div>
+                </div>
+                {% if request.user.is_authenticated %}
+                <div class='row'>
+                  <div class='col'>
+                  <h1>Premium</h1>
+                  {{ premium_content }}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              <!-- Optional JavaScript -->
+              <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+              <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+              <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </body>
+          </html>
+```
+
+Inside `ecommerce/src/templates/base` create the file `css.html`
+
+```html
+{% load static %}
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+```
+
 ### Pass Arguments with Include
+
+Inside `ecommerce/src/templates` modify the file `base.html`
+
+```html
+{% load static %}
+<!doctype html>
+  <html lang="en">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>Base Template</title>
+      {% include 'base/css.html' %}
+      {% block base_head %}{% endblock %}
+    </head>
+    <body>
+      {% incude 'base/navbar.html' with brand_name='eCommerce' %}
+      {% block content %}{% endblock %}
+
+      {% include 'base/js.html' %}
+    </body>
+  </html>
+```
+
+Inside `ecommerce/src/templates/base` modify the file `navbar.html`
+
+```html
+<h1>{{ brand_name }}</h1>
+```
+
+Inside `ecommerce/src/templates/contact` modify the file `view.html`
+
+
+```html
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include 'base/navbar.html' with brand_name=brand %}
+
+<div class='text-center'>
+                <h1>{{ title }}</h1>
+                <h1>Hello, world We're working!</h1>
+              </div>
+              
+              <div class='container'>
+              <div class='row'>
+                <div class='col'>
+                  <p>{{ content }}</p>
+                  <div class='col-sm-6 col-12'>
+                  <form method='POST'> {% csrf_token %}
+                    {{ form }}
+                    <button type='submit' class='btn btn-default'>Submit</button>
+                  </form>
+                  </div>
+                </div>
+              </div>
+              </div>
+{% endblock %}
+```
+
+
+Inside `ecommerce/src/ecommerce` modify the file `views.py`
+
+```python
+rom django.contrib.auth import authenticate, login, get_user_model
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+
+from .forms import ContactForm, LoginForm, RegisterForm
+
+def home_page(request):
+  context = {
+    "title":"Hello World!",
+    "content":"Welcome to the homepage.",
+    
+  }
+  if request.user.is_authenticated():
+    context["premium_content"] = "YEAHHHHHH"
+  return render(request, "home_page.html", context)
+  
+def about_page(request):
+  context = {
+    "title":"About Page",
+    "content":"Welcome to the about page."
+  }
+  return render(request, "home_page.html", context)
+  
+def contact_page(request):
+  contact_form = ContactForm(request.POST or None)
+  context = {
+    "title":"Contact",
+    "content":"Welcome to the contact page."
+    "form":contact_form,
+    "brand":"new Brand Name"
+  }
+  if contact_form.is_valid():
+    print(contact_form.cleaned_data)
+  return render(request, "contact/view.html", context)
+  
+def login_page(request):
+  form = LoginForm(request.POST or None)
+  context = {
+    "form": form
+  }
+  print("User logged in")
+  #print(request.user.is_authenticated())
+  if form.is_valid():
+    print(form.cleaned_data)
+    username = form.cleaned_data.get("username")
+    password = form.cleaned_data.get("password")
+    user = authenticate(request, username=username, password=password)
+    print(user)
+    #print(request.user.is_authenticated())
+    if user is not None:
+      #print(request.user.is_authenticated())
+      login(request, user)
+      # Redirect to a success page.
+      #context['form'] = LoginForm()
+      return redirect("/")
+    else:
+      # Return an 'invalid login' error message.
+      print("Error")
+    
+  return render(request, "auth/login.html", context)
+  
+User = get_user_model()
+def register_page(request):
+  form = RegisterForm(request.POST or None)
+  context = {
+    "form": form
+  }
+  if form.is_valid():
+    print(form.cleaned_data)
+    username = form.cleaned_data.get("username")
+    email = form.cleaned_data.get("email")
+    password = form.cleaned_data.get("password")
+    new_user = User.objects.create_user(username, email, password)
+    print(new_user)
+  return render(request, "auth/register.html", context)
+```
 
 ### Reusable List View Snippets
 
